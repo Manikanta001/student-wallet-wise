@@ -28,7 +28,7 @@ router.post('/', auth, async (req: AuthRequest, res) => {
 });
 
 router.get('/', auth, async (req: AuthRequest, res) => {
-  const { month } = req.query; // YYYY-MM optional filter
+  const { month, category } = req.query; // YYYY-MM optional filter
   const filter: any = { userId: req.user!.id };
   if (typeof month === 'string') {
     const start = new Date(month + '-01T00:00:00.000Z');
@@ -36,7 +36,10 @@ router.get('/', auth, async (req: AuthRequest, res) => {
     end.setMonth(end.getMonth() + 1);
     filter.date = { $gte: start, $lt: end };
   }
-  const expenses = await Expense.find(filter).sort({ date: -1 });
+  if (typeof category === 'string' && category !== 'all') {
+    filter.category = category;
+  }
+  const expenses = await Expense.find(filter).sort({ date: -1 }).limit(50);
   res.json(expenses);
 });
 
