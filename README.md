@@ -32,6 +32,20 @@ npm install
 npm run dev:full
 ```
 
+## Documentation
+Additional detailed docs are in the `docs/` directory:
+
+| File | Purpose |
+|------|---------|
+| `docs/architecture.md` | Overall system & data model relationships |
+| `docs/api-reference.md` | Complete REST endpoint list & responses |
+| `docs/environment.md` | Environment variable usage & patterns |
+| `docs/frontend-integration.md` | How the frontend calls the backend & auth handling |
+| `docs/recurring-expenses.md` | Recurring expense generation logic & future cron notes |
+| `docs/security.md` | Current security profile & hardening roadmap |
+
+Use these to onboard new contributors or plan next features.
+
 ## How can I edit this code?
 
 There are several ways of editing your application.
