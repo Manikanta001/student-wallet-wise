@@ -119,17 +119,21 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/c
 The project now includes a Node.js/Express backend under `server/` providing authentication, expenses, categories, budgets, recurring expenses, and stats.
 
 ### Environment Variables
-Create a `.env` at the repository root:
+Create a `server/.env` for backend and root `.env` for frontend:
 ```
+# server/.env
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=super_secret_change_me
-PORT=4000
+PORT=3000
+
+# .env (frontend)
+VITE_API_BASE_URL=http://localhost:3000
 ```
 
 ### Install & Run
 ```bash
 npm install
-npm run server   # backend (http://localhost:4000)
+npm run server   # backend (http://localhost:3000)
 npm run dev      # frontend (http://localhost:5173 by default)
 # or both
 npm run dev:full

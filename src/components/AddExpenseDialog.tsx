@@ -6,12 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { Api } from "@/lib/api";
+import { useQueryClient } from "@tanstack/react-query";
 
-interface AddExpenseDialogProps {
-  onAddExpense: (expense: { description: string; category: string; amount: number; date: string }) => void;
-}
-
-export const AddExpenseDialog = ({ onAddExpense }: AddExpenseDialogProps) => {
+export const AddExpenseDialog = () => {
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
@@ -32,12 +31,18 @@ export const AddExpenseDialog = ({ onAddExpense }: AddExpenseDialogProps) => {
       return;
     }
 
-    onAddExpense({
-      description,
-      category,
-      amount: numAmount,
-      date,
-    });
+    Api.createExpense({ description, category, amount: numAmount, date })
+      .then(() => {
+        toast.success("Expense added successfully!");
+        queryClient.invalidateQueries({ queryKey: ["recent"] });
+        queryClient.invalidateQueries({ queryKey: ["categories"] });
+        queryClient.invalidateQueries({ queryKey: ["budget"] });
+        queryClient.invalidateQueries({ queryKey: ["summary"] });
+      })
+      .catch((e) => {
+        toast.error(e.message || "Failed to add expense");
+        return;
+      });
 
     toast.success("Expense added successfully!");
     setDescription("");

@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { Api } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 import { DashboardStats } from "@/components/DashboardStats";
 import { ExpenseChart } from "@/components/ExpenseChart";
 import { RecentTransactions } from "@/components/RecentTransactions";
 import { AddExpenseDialog } from "@/components/AddExpenseDialog";
-import { SetBudgetDialog } from "@/components/SetBudgetDialog";
-import { Wallet } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Wallet, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Transaction {
   id: string;
@@ -17,18 +18,23 @@ interface Transaction {
   date: string;
 }
 
-const Index = () => {
+const Dashboard = () => {
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
   const [month] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
   });
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const recentQuery = useQuery<{ id: string; description: string; category: string; amount: number; date: string }[]>({ queryKey: ['recent', selectedCategory], queryFn: () => selectedCategory === 'all' ? Api.recentExpenses() : Api.expensesByCategory(selectedCategory) });
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const recentQuery = useQuery<{ id: string; description: string; category: string; amount: number; date: string }[]>({ queryKey: ['recent'], queryFn: () => Api.recentExpenses() });
   const categoriesQuery = useQuery<{ category: string; amount: number }[]>({ queryKey: ['categories', month], queryFn: () => Api.categoryStats(month) });
   const budgetQuery = useQuery<{ month: string; budget: number; spent: number; remaining: number }>({ queryKey: ['budget', month], queryFn: () => Api.budgetSummary(month) });
   const summaryQuery = useQuery<{ month: string; totalExpenses: number; percentChange: number }>({ queryKey: ['summary'], queryFn: () => Api.monthSummary() });
-  const allCategoriesQuery = useQuery<{ _id: string; name: string }[]>({ queryKey: ['allCategories'], queryFn: () => Api.categories() });
 
   const transactions = recentQuery.data || [];
   const totalExpenses = summaryQuery.data?.totalExpenses || 0;
@@ -36,7 +42,6 @@ const Index = () => {
   const budget = budgetQuery.data?.budget || 0;
   const savings = Math.max(0, (budgetQuery.data?.budget || 0) - (budgetQuery.data?.spent || 0));
   const categoryData = categoriesQuery.data || [];
-  const allCategories = allCategoriesQuery.data || [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -48,13 +53,16 @@ const Index = () => {
                 <Wallet className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Smart Expense Tracker</h1>
-                <p className="text-sm text-muted-foreground">Manage your finances wisely</p>
+                <h1 className="text-2xl font-bold text-foreground">Student Wallet Wise</h1>
+                <p className="text-sm text-muted-foreground">Welcome, {user?.name || 'User'}</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <SetBudgetDialog />
+            <div className="flex items-center gap-4">
               <AddExpenseDialog />
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
             </div>
           </div>
         </div>
@@ -78,20 +86,6 @@ const Index = () => {
           </section>
 
           <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-foreground">Recent Transactions</h2>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {allCategories.map(cat => (
-                    <SelectItem key={cat._id} value={cat.name}>{cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
             <RecentTransactions transactions={transactions} />
           </section>
         </div>
@@ -100,4 +94,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Dashboard;

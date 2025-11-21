@@ -1,7 +1,12 @@
 import dotenv from 'dotenv';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Load .env from server directory
+// Derive __dirname in ESM scope
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from server directory (server/.env)
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 export const ENV = {
