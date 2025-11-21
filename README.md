@@ -4,6 +4,34 @@
 
 **URL**: https://lovable.dev/projects/0abda645-d3ba-4154-842b-e68a8ac52a7b
 
+## Environment Setup
+
+This project has separate environment files for frontend and backend:
+
+**Frontend (root directory)**
+- `.env` - Frontend environment variables (Vite)
+- `.env.example` - Template for frontend env vars
+
+**Backend (server directory)**
+- `server/.env` - Backend environment variables
+- `server/.env.example` - Template for backend env vars
+
+### Quick Setup
+```bash
+# 1. Copy example files and set your values
+cp .env.example .env
+cp server/.env.example server/.env
+
+# 2. Edit server/.env and add your MongoDB connection string
+# MONGODB_URI=mongodb+srv://your-connection-string
+
+# 3. Install dependencies
+npm install
+
+# 4. Run backend and frontend
+npm run dev:full
+```
+
 ## How can I edit this code?
 
 There are several ways of editing your application.
